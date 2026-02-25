@@ -183,8 +183,8 @@ export default function ProductsPage() {
         </button>
       </div>
 
-      <div className="border-border overflow-hidden rounded border bg-white">
-        <table className="w-full text-sm">
+      <div className="border-border overflow-x-auto rounded border bg-white">
+        <table className="w-full min-w-120 text-sm">
           <thead>
             <tr className="border-border border-b bg-slate-50 text-left text-xs font-semibold tracking-wide text-slate-500 uppercase">
               <th className="px-4 py-3">Name</th>
