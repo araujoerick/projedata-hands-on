@@ -2,9 +2,9 @@ import { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 
 const navItems = [
-  { to: "/raw-materials", label: "Raw Materials" },
-  { to: "/products", label: "Products" },
-  { to: "/production", label: "Production" },
+  { to: "/raw-materials", label: "Matérias-primas" },
+  { to: "/products", label: "Produtos" },
+  { to: "/production", label: "Produção" },
 ];
 
 export default function Layout() {

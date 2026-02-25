@@ -98,30 +98,26 @@ export default function RawMaterialsPage() {
   return (
     <div>
       <h1 className="mb-6 text-xl font-bold text-slate-800">
-        Raw Materials Inventory
+        Estoque de Matérias-primas
       </h1>
 
       {/* Stats */}
       <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
         <StatCard
-          label="Total Items"
+          label="Total de itens"
           value={totalItems}
           color="text-slate-700"
         />
-        <StatCard
-          label="Healthy Stock"
-          value={healthyCount}
-          color="text-success"
-        />
-        <StatCard label="Low Stock" value={lowCount} color="text-warning" />
-        <StatCard label="Out of Stock" value={outCount} color="text-danger" />
+        <StatCard label="Normal" value={healthyCount} color="text-success" />
+        <StatCard label="Estoque baixo" value={lowCount} color="text-warning" />
+        <StatCard label="Sem estoque" value={outCount} color="text-danger" />
       </div>
 
       {/* Search + Add */}
       <div className="mb-4 flex gap-3">
         <input
           type="text"
-          placeholder="Search by name..."
+          placeholder="Buscar por nome..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="border-border focus:border-primary focus:ring-primary flex-1 rounded border bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:ring-1"
@@ -130,22 +126,22 @@ export default function RawMaterialsPage() {
           onClick={openCreate}
           className="bg-primary rounded px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
         >
-          Add Raw Material
+          Nova Matéria-prima
         </button>
       </div>
 
       {/* Error */}
-      {error && <p className="text-danger mb-4 text-sm">Error: {error}</p>}
+      {error && <p className="text-danger mb-4 text-sm">Erro: {error}</p>}
 
       {/* Table */}
       <div className="border-border overflow-x-auto rounded border bg-white">
         <table className="w-full min-w-120 text-sm">
           <thead>
             <tr className="border-border border-b bg-slate-50 text-left text-xs font-semibold tracking-wide text-slate-500 uppercase">
-              <th className="px-4 py-3">Name</th>
-              <th className="px-4 py-3">Stock Quantity</th>
+              <th className="px-4 py-3">Nome</th>
+              <th className="px-4 py-3">Qtd. em Estoque</th>
               <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3">Actions</th>
+              <th className="px-4 py-3">Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -155,7 +151,7 @@ export default function RawMaterialsPage() {
                   colSpan={4}
                   className="px-4 py-8 text-center text-slate-400"
                 >
-                  Loading...
+                  Carregando...
                 </td>
               </tr>
             )}
@@ -165,7 +161,7 @@ export default function RawMaterialsPage() {
                   colSpan={4}
                   className="px-4 py-8 text-center text-slate-400"
                 >
-                  No raw materials found.
+                  Nenhuma matéria-prima encontrada.
                 </td>
               </tr>
             )}
@@ -190,13 +186,13 @@ export default function RawMaterialsPage() {
                         onClick={() => openEdit(item)}
                         className="border-border rounded border px-3 py-1 text-xs text-slate-600 hover:bg-slate-100"
                       >
-                        Edit
+                        Editar
                       </button>
                       <button
                         onClick={() => setDeleteTarget(item)}
                         className="text-danger rounded border border-red-200 px-3 py-1 text-xs hover:bg-red-50"
                       >
-                        Delete
+                        Excluir
                       </button>
                     </div>
                   </td>
@@ -209,13 +205,13 @@ export default function RawMaterialsPage() {
       {/* Create/Edit Modal */}
       {modalOpen && (
         <Modal
-          title={editing ? "Edit Raw Material" : "Add Raw Material"}
+          title={editing ? "Editar Matéria-prima" : "Nova Matéria-prima"}
           onClose={closeModal}
         >
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div>
               <label className="mb-1 block text-xs font-medium text-slate-600">
-                Name
+                Nome
               </label>
               <input
                 type="text"
@@ -227,7 +223,7 @@ export default function RawMaterialsPage() {
             </div>
             <div>
               <label className="mb-1 block text-xs font-medium text-slate-600">
-                Stock Quantity
+                Quantidade em Estoque
               </label>
               <input
                 type="number"
@@ -247,13 +243,13 @@ export default function RawMaterialsPage() {
                 onClick={closeModal}
                 className="border-border rounded border px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
               >
-                Cancel
+                Cancelar
               </button>
               <button
                 type="submit"
                 className="bg-primary rounded px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
               >
-                {editing ? "Save" : "Create"}
+                {editing ? "Salvar" : "Cadastrar"}
               </button>
             </div>
           </form>
@@ -263,7 +259,7 @@ export default function RawMaterialsPage() {
       {/* Delete Confirm */}
       {deleteTarget && (
         <ConfirmDialog
-          message={`Delete "${deleteTarget.name}"? This action cannot be undone.`}
+          message={`Excluir "${deleteTarget.name}"? Esta ação não pode ser desfeita.`}
           onConfirm={handleDelete}
           onCancel={() => setDeleteTarget(null)}
         />

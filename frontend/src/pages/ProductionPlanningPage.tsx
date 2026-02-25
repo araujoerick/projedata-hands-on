@@ -25,24 +25,24 @@ export default function ProductionPlanningPage() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-xl font-bold text-slate-800">
-          Production Planning
+          Planejamento de Produção
         </h1>
         <button
           onClick={handleCalculate}
           disabled={loading}
           className="bg-primary rounded px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
         >
-          {loading ? "Calculating..." : "Calculate Production"}
+          {loading ? "Calculando..." : "Calcular Produção"}
         </button>
       </div>
 
-      {error && <p className="text-danger mb-4 text-sm">Error: {error}</p>}
+      {error && <p className="text-danger mb-4 text-sm">Erro: {error}</p>}
 
       {!hasCalculated && !loading && (
         <div className="border-border flex flex-col items-center justify-center rounded border bg-white py-16 text-center">
           <p className="text-slate-500">
-            Click <strong>Calculate Production</strong> to see production
-            suggestions based on current stock.
+            Clique em <strong>Calcular Produção</strong> para ver as sugestões
+            de produção com base no estoque atual.
           </p>
         </div>
       )}
@@ -54,10 +54,10 @@ export default function ProductionPlanningPage() {
             <table className="w-full min-w-120 text-sm">
               <thead>
                 <tr className="border-border border-b bg-slate-50 text-left text-xs font-semibold tracking-wide text-slate-500 uppercase">
-                  <th className="px-4 py-3">Product Name</th>
-                  <th className="px-4 py-3">Unit Value</th>
-                  <th className="px-4 py-3">Producible Qty</th>
-                  <th className="px-4 py-3">Total Value</th>
+                  <th className="px-4 py-3">Produto</th>
+                  <th className="px-4 py-3">Valor Unitário</th>
+                  <th className="px-4 py-3">Qtd. Produzível</th>
+                  <th className="px-4 py-3">Valor Total</th>
                 </tr>
               </thead>
               <tbody>
@@ -67,7 +67,7 @@ export default function ProductionPlanningPage() {
                       colSpan={4}
                       className="px-4 py-8 text-center text-slate-400"
                     >
-                      No production possible with current stock levels.
+                      Nenhum produto pode ser produzido com o estoque atual.
                     </td>
                   </tr>
                 )}
@@ -97,7 +97,7 @@ export default function ProductionPlanningPage() {
           {/* Grand Total Card */}
           <div className="border-primary bg-primary/5 flex items-center justify-between rounded border px-6 py-4">
             <span className="text-sm font-semibold tracking-wide text-slate-700 uppercase">
-              Grand Total Value
+              Valor Total da Produção
             </span>
             <span className="text-primary text-2xl font-bold">
               {brl(grandTotal)}

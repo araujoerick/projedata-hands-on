@@ -5,16 +5,16 @@ interface StatusBadgeProps {
 function getStatus(quantity: number): { label: string; className: string } {
   if (quantity === 0)
     return {
-      label: "Out of Stock",
+      label: "Sem estoque",
       className: "bg-red-100 text-red-700",
     };
   if (quantity < 10)
     return {
-      label: "Low Stock",
+      label: "Estoque baixo",
       className: "bg-amber-100 text-amber-700",
     };
   return {
-    label: "Healthy",
+    label: "Normal",
     className: "bg-green-100 text-green-700",
   };
 }
