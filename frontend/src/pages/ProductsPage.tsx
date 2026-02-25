@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../store/index";
 import {
@@ -215,7 +215,7 @@ export default function ProductsPage() {
             )}
             {!loading &&
               items.map((product) => (
-                <>
+                <React.Fragment key={product.id}>
                   <tr
                     key={product.id}
                     className={`border-border cursor-pointer border-b hover:bg-slate-50 ${
@@ -322,7 +322,7 @@ export default function ProductsPage() {
                       </td>
                     </tr>
                   )}
-                </>
+                </React.Fragment>
               ))}
           </tbody>
         </table>
