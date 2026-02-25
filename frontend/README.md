@@ -1,73 +1,70 @@
-# React + TypeScript + Vite
+# Frontend — Projedata
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+SPA construída com React 19, Redux Toolkit, TypeScript e Vite.
 
-Currently, two official plugins are available:
+## Pré-requisitos
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Node 20+
+- npm 10+
 
-## React Compiler
+## Como rodar
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+App disponível em `http://localhost:5173`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Variável de ambiente
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Crie um arquivo `.env` na raiz de `/frontend`:
+
+```env
+VITE_API_BASE_URL=http://localhost:8080
+```
+
+> O Vite substitui `import.meta.env.VITE_*` em **tempo de build**, por isso o valor precisa estar disponível antes de `npm run build`.
+
+## Estrutura de pastas
+
+```
+src/
+├── api/
+│   ├── client.ts                  # Instância Axios com baseURL
+│   ├── rawMaterialsApi.ts
+│   ├── productsApi.ts
+│   └── productionPlanningApi.ts
+├── store/
+│   ├── index.ts                   # Configuração do Redux store
+│   ├── rawMaterialsSlice.ts
+│   ├── productsSlice.ts
+│   └── productionPlanningSlice.ts
+├── types/
+│   ├── rawMaterial.ts
+│   ├── product.ts
+│   └── productionPlanning.ts
+├── components/
+│   ├── Layout.tsx                 # Sidebar + outlet (responsivo)
+│   ├── StatusBadge.tsx
+│   ├── Modal.tsx
+│   └── ConfirmDialog.tsx
+└── pages/
+    ├── RawMaterialsPage.tsx
+    ├── ProductsPage.tsx
+    └── ProductionPlanningPage.tsx
+```
+
+## Telas
+
+| Tela | Rota | Descrição |
+|---|---|---|
+| Raw Materials | `/raw-materials` | CRUD de matérias-primas com cards de stats e badge de status de estoque |
+| Products & BOM | `/products` | CRUD de produtos com painel BOM expansível por produto |
+| Production Planning | `/production` | Cálculo de produção sugerida com tabela de resultados e grand total |
+
+## Build de produção
+
+```bash
+npm run build   # gera dist/
 ```
