@@ -1,126 +1,124 @@
 -- ============================================================
--- V4 — Seed data: simulates a small furniture/wood industry
+-- V4 — Seed data: simula uma indústria moveleira brasileira
 -- ============================================================
--- Scenarios covered:
---   1. Shared raw materials between products (tests greedy priority)
---   2. Products ordered by value DESC get materials first
---   3. Out-of-stock materials (qty = 0)  → danger badge
---   4. Low-stock materials (qty < 10)    → warning badge
---   5. Healthy-stock materials (qty ≥ 10) → success badge
---   6. A product with no BOM (should be skipped by the algorithm)
---   7. A product whose BOM has a zero-stock material (cannot produce)
+-- Cenários cobertos:
+--   1. Matéria-prima compartilhada entre produtos (testa prioridade greedy)
+--   2. Produtos ordenados por valor DESC recebem insumos primeiro
+--   3. Matéria-prima com estoque zerado (qty = 0)  → badge "Sem estoque"
+--   4. Matéria-prima com estoque baixo (qty < 10)  → badge "Estoque baixo"
+--   5. Matéria-prima com estoque normal (qty ≥ 10) → badge "Normal"
+--   6. Produto sem BOM (ignorado pelo algoritmo)
+--   7. Produto cujo BOM tem insumo zerado (não pode ser produzido)
 -- ============================================================
 
 -- --------------------------------
--- Raw Materials (10 items)
+-- Matérias-primas (10 itens)
 -- --------------------------------
 INSERT INTO raw_materials (name, stock_quantity) VALUES
-  ('Pine Wood Plank',       120.0000),   -- id 1  | healthy
-  ('Oak Wood Plank',         25.0000),   -- id 2  | healthy
-  ('Steel Screw (100-pack)',  8.0000),   -- id 3  | low stock (< 10)
-  ('Wood Glue (liters)',     15.5000),   -- id 4  | healthy
-  ('Sandpaper Sheet',        50.0000),   -- id 5  | healthy
-  ('Varnish (liters)',        6.5000),   -- id 6  | low stock
-  ('Fabric (meters)',         0.0000),   -- id 7  | out of stock
-  ('Foam Padding (kg)',       3.0000),   -- id 8  | low stock
-  ('Glass Panel',            12.0000),   -- id 9  | healthy
-  ('Steel Bracket',          40.0000);   -- id 10 | healthy
+  ('Prancha de Pinus',         120.0000),   -- id 1  | normal
+  ('Prancha de Carvalho',       25.0000),   -- id 2  | normal
+  ('Parafuso (cento)',           8.0000),   -- id 3  | estoque baixo (< 10)
+  ('Cola para Madeira (litro)', 15.5000),   -- id 4  | normal
+  ('Folha de Lixa',             50.0000),   -- id 5  | normal
+  ('Verniz (litro)',             6.5000),   -- id 6  | estoque baixo
+  ('Tecido (metro)',             0.0000),   -- id 7  | sem estoque
+  ('Espuma (kg)',                3.0000),   -- id 8  | estoque baixo
+  ('Painel de Vidro',           12.0000),   -- id 9  | normal
+  ('Cantoneira de Aço',         40.0000);   -- id 10 | normal
 
 -- --------------------------------
--- Products (6 items)
+-- Produtos (6 itens)
 -- --------------------------------
 INSERT INTO products (name, value) VALUES
-  ('Executive Oak Desk',    1250.00),  -- id 1 | highest value → priority 1
-  ('Pine Bookshelf',         480.00),  -- id 2 | priority 2
-  ('Coffee Table',           350.00),  -- id 3 | priority 3, shares Pine Wood with Bookshelf
-  ('Upholstered Chair',      820.00),  -- id 4 | high value but needs Fabric (stock=0) → cannot produce
-  ('Display Cabinet',        950.00),  -- id 5 | priority after Desk, uses Glass + Oak
-  ('Prototype Widget',        99.00);  -- id 6 | NO BOM → skipped by algorithm
+  ('Escrivaninha de Carvalho',  1250.00),  -- id 1 | maior valor → prioridade 1
+  ('Estante de Pinus',           480.00),  -- id 2 | prioridade 4
+  ('Mesa de Centro',             350.00),  -- id 3 | prioridade 5, compartilha Pinus
+  ('Poltrona Estofada',          820.00),  -- id 4 | alto valor mas precisa de Tecido (zerado)
+  ('Cristaleira com Vidro',      950.00),  -- id 5 | prioridade 2, usa Vidro + Carvalho
+  ('Protótipo Interno',           99.00);  -- id 6 | SEM BOM → ignorado pelo algoritmo
 
 -- --------------------------------
--- BOM — Bill of Materials
+-- BOM — Composição dos Produtos
 -- --------------------------------
 
--- Product 1: Executive Oak Desk (R$ 1250.00)
---   Needs: 4 Oak Planks + 2 Screw packs + 1L Glue + 2 Sandpaper + 1.5L Varnish + 4 Brackets
+-- Produto 1: Escrivaninha de Carvalho (R$ 1.250,00)
+--   Precisa: 4 Pranchas de Carvalho + 2 centos de Parafuso + 1L Cola + 2 Lixas + 1,5L Verniz + 4 Cantoneiras
 INSERT INTO product_raw_materials (product_id, raw_material_id, required_quantity) VALUES
-  (1, 2,  4.0000),   -- Oak Wood Plank
-  (1, 3,  2.0000),   -- Steel Screw
-  (1, 4,  1.0000),   -- Wood Glue
-  (1, 5,  2.0000),   -- Sandpaper
-  (1, 6,  1.5000),   -- Varnish
-  (1, 10, 4.0000);   -- Steel Bracket
+  (1, 2,  4.0000),   -- Prancha de Carvalho
+  (1, 3,  2.0000),   -- Parafuso (cento)
+  (1, 4,  1.0000),   -- Cola para Madeira
+  (1, 5,  2.0000),   -- Folha de Lixa
+  (1, 6,  1.5000),   -- Verniz
+  (1, 10, 4.0000);   -- Cantoneira de Aço
 
--- Expected: floor(25/4)=6, floor(8/2)=4, floor(15.5/1)=15, floor(50/2)=25, floor(6.5/1.5)=4, floor(40/4)=10
--- min = 4 units → total R$ 5000.00
--- After: Oak=25-16=9, Screw=8-8=0, Glue=15.5-4=11.5, Sandpaper=50-8=42, Varnish=6.5-6=0.5, Bracket=40-16=24
+-- Cálculo esperado:
+--   floor(25/4)=6, floor(8/2)=4, floor(15,5/1)=15, floor(50/2)=25, floor(6,5/1,5)=4, floor(40/4)=10
+--   mínimo = 4 unidades → total R$ 5.000,00
+-- Após: Carvalho=9, Parafuso=0, Cola=11,5, Lixa=42, Verniz=0,5, Cantoneira=24
 
--- Product 5: Display Cabinet (R$ 950.00)
---   Needs: 3 Oak Planks + 2 Glass Panels + 1 Screw pack + 0.5L Varnish + 2 Brackets
+-- Produto 5: Cristaleira com Vidro (R$ 950,00)
+--   Precisa: 3 Pranchas de Carvalho + 2 Painéis de Vidro + 1 cento Parafuso + 0,5L Verniz + 2 Cantoneiras
 INSERT INTO product_raw_materials (product_id, raw_material_id, required_quantity) VALUES
-  (5, 2,  3.0000),   -- Oak Wood Plank
-  (5, 9,  2.0000),   -- Glass Panel
-  (5, 3,  1.0000),   -- Steel Screw
-  (5, 6,  0.5000),   -- Varnish
-  (5, 10, 2.0000);   -- Steel Bracket
+  (5, 2,  3.0000),   -- Prancha de Carvalho
+  (5, 9,  2.0000),   -- Painel de Vidro
+  (5, 3,  1.0000),   -- Parafuso (cento)
+  (5, 6,  0.5000),   -- Verniz
+  (5, 10, 2.0000);   -- Cantoneira de Aço
 
--- After Desk: Oak=9, Screw=0, Varnish=0.5, Glass=12, Bracket=24
--- floor(9/3)=3, floor(12/2)=6, floor(0/1)=0 → Screw=0 → min=0 → CANNOT PRODUCE
+-- Após Escrivaninha: Carvalho=9, Parafuso=0, Verniz=0,5, Vidro=12, Cantoneira=24
+-- floor(9/3)=3, floor(12/2)=6, floor(0/1)=0 → Parafuso=0 → NÃO PRODUZ
 
--- Product 4: Upholstered Chair (R$ 820.00)
---   Needs: 2 Pine Planks + 3m Fabric + 2kg Foam + 1 Screw pack
+-- Produto 4: Poltrona Estofada (R$ 820,00)
+--   Precisa: 2 Pinus + 3m Tecido + 2kg Espuma + 1 cento Parafuso
 INSERT INTO product_raw_materials (product_id, raw_material_id, required_quantity) VALUES
-  (4, 1,  2.0000),   -- Pine Wood Plank
-  (4, 7,  3.0000),   -- Fabric (stock = 0!)
-  (4, 8,  2.0000),   -- Foam Padding
-  (4, 3,  1.0000);   -- Steel Screw
+  (4, 1,  2.0000),   -- Prancha de Pinus
+  (4, 7,  3.0000),   -- Tecido (zerado!)
+  (4, 8,  2.0000),   -- Espuma
+  (4, 3,  1.0000);   -- Parafuso (cento)
 
--- Fabric = 0 → CANNOT PRODUCE regardless of other stocks
+-- Tecido = 0 → NÃO PRODUZ independente dos outros estoques
 
--- Product 2: Pine Bookshelf (R$ 480.00)
---   Needs: 6 Pine Planks + 1 Screw pack + 0.5L Glue + 3 Sandpaper + 1L Varnish + 6 Brackets
+-- Produto 2: Estante de Pinus (R$ 480,00)
+--   Precisa: 6 Pinus + 1 cento Parafuso + 0,5L Cola + 3 Lixas + 1L Verniz + 6 Cantoneiras
 INSERT INTO product_raw_materials (product_id, raw_material_id, required_quantity) VALUES
-  (2, 1,  6.0000),   -- Pine Wood Plank
-  (2, 3,  1.0000),   -- Steel Screw
-  (2, 4,  0.5000),   -- Wood Glue
-  (2, 5,  3.0000),   -- Sandpaper
-  (2, 6,  1.0000),   -- Varnish
-  (2, 10, 6.0000);   -- Steel Bracket
+  (2, 1,  6.0000),   -- Prancha de Pinus
+  (2, 3,  1.0000),   -- Parafuso (cento)
+  (2, 4,  0.5000),   -- Cola para Madeira
+  (2, 5,  3.0000),   -- Folha de Lixa
+  (2, 6,  1.0000),   -- Verniz
+  (2, 10, 6.0000);   -- Cantoneira de Aço
 
--- After Desk: Pine=120, Screw=0, Glue=11.5, Sandpaper=42, Varnish=0.5, Bracket=24
--- Screw=0 → floor(0/1)=0 → CANNOT PRODUCE
+-- Após Escrivaninha: Parafuso=0 → NÃO PRODUZ
 
--- Product 3: Coffee Table (R$ 350.00)
---   Needs: 3 Pine Planks + 1 Screw pack + 0.5L Glue + 1 Sandpaper + 4 Brackets
+-- Produto 3: Mesa de Centro (R$ 350,00)
+--   Precisa: 3 Pinus + 1 cento Parafuso + 0,5L Cola + 1 Lixa + 4 Cantoneiras
 INSERT INTO product_raw_materials (product_id, raw_material_id, required_quantity) VALUES
-  (3, 1,  3.0000),   -- Pine Wood Plank
-  (3, 3,  1.0000),   -- Steel Screw
-  (3, 4,  0.5000),   -- Wood Glue
-  (3, 5,  1.0000),   -- Sandpaper
-  (3, 10, 4.0000);   -- Steel Bracket
+  (3, 1,  3.0000),   -- Prancha de Pinus
+  (3, 3,  1.0000),   -- Parafuso (cento)
+  (3, 4,  0.5000),   -- Cola para Madeira
+  (3, 5,  1.0000),   -- Folha de Lixa
+  (3, 10, 4.0000);   -- Cantoneira de Aço
 
--- After Desk: Pine=120, Screw=0, Glue=11.5, Sandpaper=42, Bracket=24
--- Screw=0 → floor(0/1)=0 → CANNOT PRODUCE
+-- Após Escrivaninha: Parafuso=0 → NÃO PRODUZ
 
--- Product 6: Prototype Widget (R$ 99.00)
---   NO BOM entries → algorithm skips it
+-- Produto 6: Protótipo Interno (R$ 99,00)
+--   SEM itens no BOM → algoritmo ignora
 
 -- ============================================================
--- Expected Production Planning Result (greedy, value DESC):
+-- Resultado esperado do Planejamento de Produção (greedy por valor DESC):
 --
--- 1. Executive Oak Desk  → 4 units × R$ 1,250.00 = R$ 5,000.00
---    (Screws become bottleneck at 4 units, consumes all 8 packs)
+-- 1. Escrivaninha de Carvalho → 4 unid. × R$ 1.250,00 = R$ 5.000,00
+--    (Parafuso é o gargalo: floor(8/2)=4; Verniz também: floor(6,5/1,5)=4)
 --
--- 2. Display Cabinet     → 0 (Screws depleted)
--- 3. Upholstered Chair   → 0 (Fabric = 0)
--- 4. Pine Bookshelf      → 0 (Screws depleted)
--- 5. Coffee Table        → 0 (Screws depleted)
--- 6. Prototype Widget    → skipped (no BOM)
+-- 2. Cristaleira com Vidro    → 0 (Parafuso esgotado)
+-- 3. Poltrona Estofada        → 0 (Tecido = 0)
+-- 4. Estante de Pinus         → 0 (Parafuso esgotado)
+-- 5. Mesa de Centro           → 0 (Parafuso esgotado)
+-- 6. Protótipo Interno        → ignorado (sem BOM)
 --
--- Grand Total: R$ 5,000.00
+-- Total Geral: R$ 5.000,00
 --
--- UI observations:
---   - Stats cards: 10 total, 5 healthy, 3 low, 2 out-of-stock (Fabric + after deductions)
---   - Only 1 product line in suggestions table
---   - Grand total card: R$ 5.000,00
+-- Badges esperados na tela de Matérias-primas:
+--   Total=10 | Normal=5 | Estoque baixo=3 | Sem estoque=1 (Tecido)
+--   (Parafuso e Verniz aparecem como "Estoque baixo" antes da produção)
 -- ============================================================
