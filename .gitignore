@@ -1,0 +1,22 @@
+# Backend
+backend/target/
+backend/.quarkus/
+backend/.env
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Claude
+.claude/
