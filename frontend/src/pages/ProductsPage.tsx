@@ -170,11 +170,10 @@ export default function ProductsPage() {
 
   return (
     <div>
-      <h1 className="mb-6 text-xl font-bold text-slate-800">
-        Produtos e Composição (BOM)
-      </h1>
-
-      <div className="mb-2 flex justify-end">
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-xl font-bold text-slate-800">
+          Produtos e Composição (BOM)
+        </h1>
         <button
           onClick={openCreateProduct}
           className="bg-primary rounded px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
@@ -218,13 +217,28 @@ export default function ProductsPage() {
                 <React.Fragment key={product.id}>
                   <tr
                     key={product.id}
-                    className={`border-border cursor-pointer border-b hover:bg-slate-50 ${
+                    className={`border-border group cursor-pointer border-b hover:bg-slate-50 ${
                       selectedDetail?.id === product.id ? "bg-blue-50" : ""
                     }`}
                     onClick={() => selectProduct(product)}
                   >
                     <td className="px-4 py-3 font-medium text-slate-800">
-                      {product.name}
+                      <span className="flex items-center gap-1.5">
+                        <svg
+                          className={`h-3.5 w-3.5 shrink-0 text-slate-400 transition-transform ${selectedDetail?.id === product.id ? "rotate-90" : "group-hover:translate-x-0.5"}`}
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={2.5}
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
+                        {product.name}
+                      </span>
                     </td>
                     <td className="px-4 py-3 text-slate-600">
                       {brl(product.value)}
