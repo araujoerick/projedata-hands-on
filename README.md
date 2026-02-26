@@ -19,6 +19,23 @@ Sistema de controle de estoque de matérias-primas e produtos para uma indústri
 - **Products & BOM** — CRUD de produtos com gerenciamento de Bill of Materials (lista de materiais por produto)
 - **Production Planning** — cálculo greedy de produção sugerida com base no estoque disponível (prioriza produtos de maior valor)
 
+## Algoritmo de Planejamento de Produção
+
+O sistema implementa um planejamento do tipo **MRP simplificado** usando uma estratégia greedy (gulosa) orientada a valor:
+
+1. Todos os produtos são ordenados por valor unitário de forma decrescente
+2. Para cada produto, o sistema calcula quantas unidades podem ser fabricadas com o estoque virtual disponível:
+   ```
+   quantidade = floor( min( estoque_disponível / quantidade_necessária ) )
+                       para cada matéria-prima do BOM do produto
+   ```
+3. Se a quantidade for maior que zero, os insumos são deduzidos do estoque
+4. O processo repete para o próximo produto com o saldo restante
+
+**Exemplo:** se Parafuso (estoque = 8) é usado por dois produtos — Escrivaninha (precisa de 2 por unidade) e Estante (precisa de 1 por unidade) — o sistema reserva os parafusos primeiro para a Escrivaninha por ter maior valor. Após produzir 4 unidades, o estoque de parafusos chega a zero e a Estante não pode mais ser fabricada.
+
+A resposta inclui todos os produtos do catálogo: os que podem ser produzidos com a quantidade calculada, e os bloqueados (quantidade = 0) indicando insuficiência de estoque. O valor total considera apenas os itens efetivamente produzíveis.
+
 ## Estrutura do repositório
 
 ```
