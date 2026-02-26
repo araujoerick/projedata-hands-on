@@ -63,6 +63,30 @@ src/
 | Products & BOM | `/products` | CRUD de produtos com painel BOM expansível por produto |
 | Production Planning | `/production` | Cálculo de produção sugerida com tabela de resultados e grand total |
 
+## Testes
+
+O projeto usa **Vitest** + **Testing Library** + **jsdom**.
+
+```bash
+npm test          # executa todos os testes uma vez
+npm run test:watch  # modo watch (re-executa ao salvar)
+```
+
+### Cobertura
+
+| Arquivo | Tipo | Casos de teste |
+|---|---|---|
+| `store/rawMaterialsSlice.test.ts` | Redux slice | Loading ao buscar; preenchimento da lista no fulfilled; erro no rejected; criação adiciona item à lista; atualização substitui item; exclusão remove item por ID |
+| `store/productionPlanningSlice.test.ts` | Redux slice | Estado inicial nulo; loading ao buscar; dados preenchidos no fulfilled; erro no rejected; grandTotalValue reflete a soma correta |
+| `components/StatusBadge.test.tsx` | Componente | Badge "Sem estoque" (qty = 0); "Estoque baixo" (1–9, incluindo valores de fronteira 1 e 9); "Normal" (≥ 10 e valores grandes); classes CSS de danger / warning / success |
+| `components/Modal.test.tsx` | Componente | Renderiza título e conteúdo; fecha ao clicar no backdrop; não fecha ao clicar no conteúdo interno; fecha ao clicar no botão X; fecha ao pressionar Escape; não fecha em outras teclas |
+
+### Configuração
+
+- `vite.config.ts` — `environment: "jsdom"`, `globals: true`, `setupFiles: ["./src/test/setup.ts"]`
+- `src/test/setup.ts` — importa `@testing-library/jest-dom` (matchers como `toBeInTheDocument`)
+- `src/test/vitest.d.ts` — types globais do Vitest para TypeScript
+
 ## Build de produção
 
 ```bash

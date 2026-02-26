@@ -117,3 +117,27 @@ src/main/resources/
 |---|---|---|
 | GET | `/api/production-planning/suggestions` | Calcular produção sugerida |
 
+---
+
+## Testes
+
+O projeto usa **JUnit 5** + **QuarkusTest** + **REST Assured** + **Mockito**. Os testes rodam com um **PostgreSQL real provisionado automaticamente via Testcontainers** (Quarkus Dev Services) — é necessário ter o Docker rodando.
+
+```bash
+cd backend
+./mvnw test
+```
+
+### Cobertura
+
+| Arquivo | Tipo | Casos de teste |
+|---|---|---|
+| `ProductionPlanningServiceTest` | Unitário | Retorno vazio sem produtos; ignora produto sem BOM; qty = 0 com estoque zerado; cálculo correto de quantidade e valor; prioriza produto de maior valor em recurso compartilhado; material bottleneck limita a produção |
+| `RawMaterialResourceTest` | Integração (REST) | Listagem vazia; listagem com itens; criação com 201; rejeição de nome em branco (400); rejeição de estoque negativo (400); atualização; 404 em ID inexistente; exclusão |
+| `ProductionPlanningResourceTest` | Integração (REST) | Retorno vazio sem dados; resultado correto com dados de produção |
+
+### Configuração de teste
+
+- **Quarkus Dev Services** sobe um container PostgreSQL automaticamente via Testcontainers — sem configuração manual de banco
+- `%test.quarkus.flyway.clean-at-start=true` em `application.properties` garante schema limpo a cada execução
+- Cada teste limpa os dados no `@BeforeEach` para isolamento total entre casos

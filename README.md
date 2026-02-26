@@ -93,6 +93,28 @@ npm run dev
 
 App disponível em `http://localhost:5173`
 
+## Testes
+
+### Backend
+
+```bash
+cd backend
+./mvnw test
+```
+
+Usa **JUnit 5 + QuarkusTest + REST Assured + Mockito**. O banco de teste é um **PostgreSQL real provisionado automaticamente via Testcontainers** (requer Docker). Cobre testes unitários do algoritmo greedy e testes de integração REST para os endpoints de matérias-primas e planejamento de produção.
+
+### Frontend
+
+```bash
+cd frontend
+npm test
+```
+
+Usa **Vitest + Testing Library + jsdom**. Cobre os Redux slices (`rawMaterials`, `productionPlanning`) e os componentes `StatusBadge` e `Modal`.
+
+---
+
 ## Variáveis de ambiente
 
 Copie `.env.example` para `.env` e ajuste os valores:
