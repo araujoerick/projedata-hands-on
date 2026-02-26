@@ -33,7 +33,7 @@ export default function Layout() {
       >
         <div className="border-border flex items-center justify-between border-b px-6 py-5">
           <span className="text-primary text-base font-bold tracking-tight">
-            Projedata
+            Projedata e Eu ♥
           </span>
           <button
             className="text-slate-400 hover:text-slate-600 lg:hidden"
@@ -86,9 +86,6 @@ export default function Layout() {
               />
             </svg>
           </button>
-          <span className="text-primary text-sm font-bold tracking-tight">
-            Projedata
-          </span>
         </header>
 
         <main className="bg-surface flex-1 overflow-auto p-4 sm:p-8">
