@@ -32,6 +32,9 @@ export default function RawMaterialsPage() {
   );
 
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<
+    "all" | "healthy" | "low" | "out"
+  >("all");
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<RawMaterial | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
@@ -41,9 +44,13 @@ export default function RawMaterialsPage() {
     dispatch(fetchRawMaterials());
   }, [dispatch]);
 
-  const filtered = items.filter((i) =>
-    i.name.toLowerCase().includes(search.toLowerCase()),
-  );
+  const filtered = items.filter((i) => {
+    const matchesSearch = i.name.toLowerCase().includes(search.toLowerCase());
+    const matchesStatus =
+      statusFilter === "all" ||
+      getStockStatus(i.stockQuantity) === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
 
   const totalItems = items.length;
   const healthyCount = items.filter(
@@ -107,10 +114,36 @@ export default function RawMaterialsPage() {
           label="Total de itens"
           value={totalItems}
           color="text-slate-700"
+          active={statusFilter === "all"}
+          onClick={() => setStatusFilter("all")}
         />
-        <StatCard label="Normal" value={healthyCount} color="text-success" />
-        <StatCard label="Estoque baixo" value={lowCount} color="text-warning" />
-        <StatCard label="Sem estoque" value={outCount} color="text-danger" />
+        <StatCard
+          label="Normal"
+          value={healthyCount}
+          color="text-success"
+          active={statusFilter === "healthy"}
+          onClick={() =>
+            setStatusFilter(statusFilter === "healthy" ? "all" : "healthy")
+          }
+        />
+        <StatCard
+          label="Estoque baixo"
+          value={lowCount}
+          color="text-warning"
+          active={statusFilter === "low"}
+          onClick={() =>
+            setStatusFilter(statusFilter === "low" ? "all" : "low")
+          }
+        />
+        <StatCard
+          label="Sem estoque"
+          value={outCount}
+          color="text-danger"
+          active={statusFilter === "out"}
+          onClick={() =>
+            setStatusFilter(statusFilter === "out" ? "all" : "out")
+          }
+        />
       </div>
 
       {/* Search + Add */}
@@ -272,11 +305,16 @@ interface StatCardProps {
   label: string;
   value: number;
   color: string;
+  active?: boolean;
+  onClick?: () => void;
 }
 
-function StatCard({ label, value, color }: StatCardProps) {
+function StatCard({ label, value, color, active, onClick }: StatCardProps) {
   return (
-    <div className="border-border rounded border bg-white px-4 py-4">
+    <div
+      onClick={onClick}
+      className={`border-border cursor-pointer rounded border bg-white px-4 py-4 transition-colors hover:bg-slate-50 ${active ? "ring-primary border-primary ring-2" : ""}`}
+    >
       <p className="text-xs font-medium text-slate-500">{label}</p>
       <p className={`mt-1 text-2xl font-bold ${color}`}>{value}</p>
     </div>
