@@ -116,3 +116,4 @@ src/main/resources/
 | Método | Path | Descrição |
 |---|---|---|
 | GET | `/api/production-planning/suggestions` | Calcular produção sugerida |
+
