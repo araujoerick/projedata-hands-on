@@ -129,3 +129,66 @@ cp .env.example .env
 | `POSTGRES_USER` | Usuário do banco |
 | `POSTGRES_PASSWORD` | Senha do banco |
 | `CORS_ORIGINS` | Origem permitida no CORS (ex.: `http://localhost:5173`) |
+
+---
+
+## Arquitetura de produção
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                        Internet                         │
+└───────────────┬─────────────────────┬───────────────────┘
+                │                     │
+        HTTPS (:443)            HTTPS (:443)
+                │                     │
+   ┌────────────▼──────────┐  ┌───────▼──────────────────┐
+   │  Vercel (CDN global)  │  │  Nginx Proxy Manager     │
+   │  frontend (React SPA) │  │  Let's Encrypt TLS       │
+   └───────────────────────┘  └───────┬──────────────────┘
+                                      │ HTTP (:8080) interno
+                               ┌──────▼──────────────────┐
+                               │  VPS                    │
+                               │  ┌───────────────────┐  │
+                               │  │ projedata-backend │  │
+                               │  │ (Quarkus :8080)   │  │
+                               │  └────────┬──────────┘  │
+                               │           │              │
+                               │  ┌────────▼──────────┐  │
+                               │  │ postgres:5432     │  │
+                               │  │ (volume persistente) │
+                               │  └───────────────────┘  │
+                               └─────────────────────────┘
+```
+
+### Componentes
+
+| Componente | Onde roda | Tecnologia |
+|---|---|---|
+| Frontend | Vercel | CDN global, deploy automático via Git |
+| Backend | VPS (Docker) | Quarkus em container |
+| Banco de dados | VPS (Docker) | PostgreSQL com volume persistente |
+| Proxy reverso / TLS | VPS | Nginx Proxy Manager + Let's Encrypt |
+
+### Endpoints de produção
+
+- **Frontend:** https://projedata-erick-araujo.vercel.app/
+- **API:** `https://api-projedata.aditivasolucoes.com.br`
+- **Swagger UI:** `http://api-projedata.aditivasolucoes.com.br/q/swagger-ui/`
+
+### Como o deploy funciona (CI/CD)
+
+O workflow `.github/workflows/deploy.yml` é disparado em todo push para `main` (ou manualmente pela aba Actions):
+
+```
+push → main
+  └── job: test
+        ├── ./mvnw test          (backend — PostgreSQL via Testcontainers)
+        └── npm test -- --run    (frontend — Vitest + jsdom)
+              │
+              └── (se passou) job: deploy
+                    └── SSH na VPS
+                          ├── git pull origin main
+                          └── docker compose up -d --build backend
+```
+
+O deploy na VPS só ocorre se **todos os testes passarem**.
