@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../store/index";
 import { fetchSuggestions } from "../store/productionPlanningSlice";
@@ -12,14 +13,21 @@ export default function ProductionPlanningPage() {
   const { data, loading, error } = useSelector(
     (state: RootState) => state.productionPlanning,
   );
+  const [showBlocked, setShowBlocked] = useState(false);
 
   function handleCalculate() {
     dispatch(fetchSuggestions());
   }
 
-  const suggestions = data?.suggestions ?? [];
+  const allSuggestions = data?.suggestions ?? [];
   const grandTotal = data?.grandTotalValue ?? 0;
   const hasCalculated = data !== null;
+  const blockedCount = allSuggestions.filter(
+    (s) => s.producibleQuantity === 0,
+  ).length;
+  const suggestions = showBlocked
+    ? allSuggestions
+    : allSuggestions.filter((s) => s.producibleQuantity > 0);
 
   return (
     <div>
@@ -27,13 +35,28 @@ export default function ProductionPlanningPage() {
         <h1 className="text-xl font-bold text-slate-800">
           Planejamento de Produção
         </h1>
-        <button
-          onClick={handleCalculate}
-          disabled={loading}
-          className="bg-primary rounded px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-        >
-          {loading ? "Calculando..." : "Calcular Produção"}
-        </button>
+
+        <div className="flex justify-center gap-4">
+          {/* Toolbar */}
+          {blockedCount > 0 && (
+            <button
+              onClick={() => setShowBlocked((v) => !v)}
+              className="border-border rounded border px-4 py-2 text-xs text-slate-600 hover:bg-slate-100"
+            >
+              {showBlocked
+                ? `Ocultar sem estoque (${blockedCount})`
+                : `Mostrar sem estoque (${blockedCount})`}
+            </button>
+          )}
+
+          <button
+            onClick={handleCalculate}
+            disabled={loading}
+            className="bg-primary rounded px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+          >
+            {loading ? "Calculando..." : "Calcular Produção"}
+          </button>
+        </div>
       </div>
 
       {error && <p className="text-danger mb-4 text-sm">Erro: {error}</p>}
@@ -71,25 +94,34 @@ export default function ProductionPlanningPage() {
                     </td>
                   </tr>
                 )}
-                {suggestions.map((s) => (
-                  <tr
-                    key={s.productId}
-                    className="border-border border-b last:border-0 hover:bg-slate-50"
-                  >
-                    <td className="px-4 py-3 font-medium text-slate-800">
-                      {s.productName}
-                    </td>
-                    <td className="px-4 py-3 text-slate-600">
-                      {brl(s.productValue)}
-                    </td>
-                    <td className="px-4 py-3 text-slate-600">
-                      {s.producibleQuantity}
-                    </td>
-                    <td className="px-4 py-3 font-medium text-slate-800">
-                      {brl(s.totalValue)}
-                    </td>
-                  </tr>
-                ))}
+                {suggestions.map((s) => {
+                  const blocked = s.producibleQuantity === 0;
+                  return (
+                    <tr
+                      key={s.productId}
+                      className={`border-border border-b last:border-0 ${blocked ? "opacity-45" : "hover:bg-slate-50"}`}
+                    >
+                      <td className="px-4 py-3 font-medium text-slate-800">
+                        {s.productName}
+                      </td>
+                      <td className="px-4 py-3 text-slate-600">
+                        {brl(s.productValue)}
+                      </td>
+                      <td className="px-4 py-3 text-slate-600">
+                        {blocked ? (
+                          <span className="text-danger text-xs font-medium">
+                            Sem estoque suficiente
+                          </span>
+                        ) : (
+                          s.producibleQuantity
+                        )}
+                      </td>
+                      <td className="px-4 py-3 font-medium text-slate-800">
+                        {blocked ? "—" : brl(s.totalValue)}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
