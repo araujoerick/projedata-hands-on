@@ -24,7 +24,14 @@ services:
       - "8080:8080"
     depends_on:
       - postgres
+    networks:
+      - default
+      - proxy-network
     restart: unless-stopped
+
+networks:
+  proxy-network:
+    external: true
 
 volumes:
   postgres_data:
