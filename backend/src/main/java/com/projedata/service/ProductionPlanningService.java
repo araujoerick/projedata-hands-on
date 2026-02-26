@@ -43,14 +43,16 @@ public class ProductionPlanningService {
                 qty = Math.min(qty, producible);
             }
 
-            if (qty == Long.MAX_VALUE || qty <= 0) {
-                continue;
+            if (qty == Long.MAX_VALUE) {
+                qty = 0;
             }
 
-            // Step 3c: deduct from stock
-            for (ProductRawMaterial bom : product.rawMaterials) {
-                BigDecimal used = bom.requiredQuantity.multiply(BigDecimal.valueOf(qty));
-                stockMap.merge(bom.rawMaterial.id, used, BigDecimal::subtract);
+            // Step 3c: deduct from stock only if something can be produced
+            if (qty > 0) {
+                for (ProductRawMaterial bom : product.rawMaterials) {
+                    BigDecimal used = bom.requiredQuantity.multiply(BigDecimal.valueOf(qty));
+                    stockMap.merge(bom.rawMaterial.id, used, BigDecimal::subtract);
+                }
             }
 
             // Build suggestion item
